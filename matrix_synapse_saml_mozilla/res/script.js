@@ -2,6 +2,8 @@ let inputField = document.getElementById("field-username");
 let inputForm = document.getElementById("form");
 let submitButton = document.getElementById("button-submit");
 let message = document.getElementById("message");
+let tabLinkButtons = document.getElementsByClassName("tablinks");
+let tabContentBlocks = document.getElementsByClassName("tabcontent");
 
 // Remove input field placeholder if the text field is not empty
 let switchClass = function(input) {
@@ -114,3 +116,17 @@ inputField.addEventListener('change', function() {
   switchClass(inputField);
 });
 
+for (let i = 0; i < tabLinkButtons.length; i++) {
+    tabLinkButtons[i].addEventListener('click', function(event) {
+        for (let i = 0; i < tabContentBlocks.length; i++) {
+            tabContentBlocks[i].classList.remove("active");
+        }
+
+        for (let i = 0; i < tabLinkButtons.length; i++) {
+            tabLinkButtons[i].classList.remove("active");
+        }
+
+        document.getElementById(event.target.dataset.tabid).classList.add('active')
+        event.target.classList.add("active")
+    })
+}

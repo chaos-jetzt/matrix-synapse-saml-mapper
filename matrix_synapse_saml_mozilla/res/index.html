@@ -6,15 +6,28 @@
   </head>
   <body>
     <div class="card">
-      <form method="post" class="form__input" id="form" action="submit">
-        <input type="text" name="username" id="field-username" autofocus="">
-        <label for="field-username">
-          <span><span aria-hidden="true">Please pick your </span>username</span>
-        </label>
-        <input type="button" class="button button--full-width" id="button-submit" value="Submit">
-      </form>
-      <div role=alert class="tooltip hidden" id="message"></div>
-      <script src="script.js"></script>
+      <div class="card-header">
+        <div class="tab">
+          <button class="tablinks active" data-tabid="connect">Connect</button>
+          <button class="tablinks" data-tabid="register">Register</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="tabcontent active" id="connect">
+          <form method="post" class="form__input" id="form" action="submit">
+            <input type="text" name="username" id="field-username" autofocus="">
+            <label for="field-username">
+              <span><span aria-hidden="true">Please pick your </span>username</span>
+            </label>
+            <input type="button" class="button button--full-width" id="button-submit" value="Submit">
+          </form>
+        </div>
+        <div class="tabcontent" id="register">
+          FOO
+        </div>
+        <div role=alert class="tooltip hidden" id="message"></div>
+        <script src="script.js"></script>
+      </div>
     </div>
   </body>
 </html>
