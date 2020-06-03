@@ -8,22 +8,37 @@
     <div class="card">
       <div class="card-header">
         <div class="tab">
-          <button class="tablinks active" data-tabid="connect">Connect</button>
-          <button class="tablinks" data-tabid="register">Register</button>
+          <button class="tablinks" data-tabid="connect">Connect</button>
+          <button class="tablinks active" data-tabid="register">Register</button>
         </div>
       </div>
       <div class="card-body">
-        <div class="tabcontent active" id="connect">
+        <div class="tabcontent active" id="register">
           <form method="post" class="form__input" id="form" action="submit">
-            <input type="text" name="username" id="field-username" autofocus="">
+            <input type="text" name="username" id="field-username" class="field" autofocus="">
             <label for="field-username">
               <span><span aria-hidden="true">Please pick your </span>username</span>
             </label>
             <input type="button" class="button button--full-width" id="button-submit" value="Submit">
           </form>
         </div>
-        <div class="tabcontent" id="register">
-          FOO
+        <div class="tabcontent" id="connect">
+          <form method="post" id="form" action="submit">
+            <div class="form__input">
+              <input type="text" name="username" id="connect-field-username" class="field" autofocus="">
+              <label for="connect-field-username">
+                <span><span aria-hidden="true">Your Matrix </span>username</span>
+              </label>
+            </div>
+            <br>
+            <div class="form__input">
+              <input type="password" name="password" id="connect-field-password">
+              <label for="connect-field-password">
+                <span><span aria-hidden="true">Your old Matrix </span>password</span>
+              </label>
+            </div>
+            <input type="button" class="button button--full-width" id="button-submit" value="Submit">
+          </form>
         </div>
         <div role=alert class="tooltip hidden" id="message"></div>
         <script src="script.js"></script>

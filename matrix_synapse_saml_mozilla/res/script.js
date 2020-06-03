@@ -1,5 +1,6 @@
-let inputField = document.getElementById("field-username");
-let inputForm = document.getElementById("form");
+let regiterFields = document.getElementById("field-username");
+let inputFields = document.getElementsByClassName("field");
+let registerForm = document.getElementById("form");
 let submitButton = document.getElementById("button-submit");
 let message = document.getElementById("message");
 let tabLinkButtons = document.getElementsByClassName("tablinks");
@@ -23,12 +24,17 @@ let showMessage = function(messageText) {
   message.innerHTML = messageText;
 };
 
+let hideMessage = function() {
+  // Hide the message text
+  message.classList.add("hidden");
+};
+
 let onResponse = function(response, success) {
   // Display message
   showMessage(response);
 
   if(success) {
-    inputForm.submit();
+    registerForm.submit();
     return;
   }
 
@@ -97,24 +103,26 @@ let clickSubmit = function() {
 
   // Submit username
   submitButton.value = "Checking...";
-  submitUsername(inputField.value);
+  submitUsername(regiterFields.value);
 };
 
 submitButton.onclick = clickSubmit;
 
-// Listen for events on inputField
-inputField.addEventListener('keypress', function(event) {
-  // Listen for Enter on input field
-  if(event.which === 13) {
-    event.preventDefault();
-    clickSubmit();
-    return true;
-  }
-  switchClass(inputField);
-});
-inputField.addEventListener('change', function() {
-  switchClass(inputField);
-});
+// Listen for events on inputFields
+for (let i = 0; i < inputFields.length; i++) {
+    inputFields[i].addEventListener('keypress', function (event) {
+        // Listen for Enter on input field
+        if (event.which === 13) {
+            event.preventDefault();
+            clickSubmit();
+            return true;
+        }
+        switchClass(inputFields[i]);
+    });
+    inputFields[i].addEventListener('change', function () {
+        switchClass(inputFields[i]);
+    });
+}
 
 for (let i = 0; i < tabLinkButtons.length; i++) {
     tabLinkButtons[i].addEventListener('click', function(event) {
@@ -128,5 +136,6 @@ for (let i = 0; i < tabLinkButtons.length; i++) {
 
         document.getElementById(event.target.dataset.tabid).classList.add('active')
         event.target.classList.add("active")
+        hideMessage()
     })
 }
