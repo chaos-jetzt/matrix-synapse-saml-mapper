@@ -27,6 +27,8 @@ import synapse.module_api
 from synapse.module_api import run_in_background
 from synapse.module_api.errors import SynapseError
 
+from synapse.api.errors import Codes, LoginError
+
 from matrix_synapse_saml_mozilla._sessions import (
     SESSION_COOKIE_NAME,
     get_mapping_session,
@@ -56,7 +58,7 @@ def pick_username_resource(
     base_path = pkg_resources.resource_filename("matrix_synapse_saml_mozilla", "res")
     res = File(base_path)
     res.putChild(b"submit", SubmitResource(module_api))
-    res.putChild(b"check", AvailabilityCheckResource(module_api))
+    res.putChild(b"check", CheckResource(module_api))
     return res
 
 
@@ -155,15 +157,32 @@ class SubmitResource(AsyncResource):
             _return_html_error(400, "missing username", request)
             return
         localpart = request.args[b"username"][0].decode("utf-8", errors="replace")
-        logger.info("Registering username %s", localpart)
-        try:
-            registered_user_id = await self._module_api.register_user(
-                localpart=localpart, displayname=localpart
-            )
-        except SynapseError as e:
-            logger.warning("Error during registration: %s", e)
-            _return_html_error(e.code, e.msg, request)
-            return
+
+        if b"password" not in request.args:
+            logger.info("Registering username %s", localpart)
+            try:
+                registered_user_id = await self._module_api.register_user(
+                    localpart=localpart, displayname=localpart
+                )
+            except SynapseError as e:
+                logger.warning("Error during registration: %s", e)
+                _return_html_error(e.code, e.msg, request)
+                return
+        else:
+            password = request.args[b"password"][0].decode("utf-8", errors="replace")
+            registered_user_id = '@{}:localhost'.format(localpart)
+
+            success = False
+            try:
+                passwd_response = await self._module_api._auth_handler._check_local_password(registered_user_id, password)
+                if passwd_response != registered_user_id:
+                    raise LoginError(403, "Invalid password", errcode=Codes.FORBIDDEN)
+            except Exception as e:
+                logger.warning(
+                    "Error checking credentials of %s: %s %s" % (localpart, type(e), e)
+                )
+                _return_html_error(e.code, e.msg, request)
+                return
 
         await self._module_api.record_user_external_id(
             "saml", session.remote_user_id, registered_user_id
@@ -186,7 +205,7 @@ class SubmitResource(AsyncResource):
         )
 
 
-class AvailabilityCheckResource(AsyncResource):
+class CheckResource(AsyncResource):
     def __init__(self, module_api: synapse.module_api.ModuleApi):
         super().__init__()
         self._module_api = module_api
@@ -222,6 +241,47 @@ class AvailabilityCheckResource(AsyncResource):
             )
             available = False
         response = {"available": available}
+        _return_json(response, request)
+
+    @_wrap_for_text_exceptions
+    async def async_render_POST(self, request: Request):
+        # make sure that there is a valid mapping session, to stop people dictionary-
+        # scanning for accounts
+        # session_id = request.getCookie(SESSION_COOKIE_NAME)
+        # if not session_id:
+        #     _return_json({"error": "missing session_id"}, request)
+        #     return
+        #
+        # session_id = session_id.decode("ascii", errors="replace")
+        # session = get_mapping_session(session_id)
+        # if not session:
+        #     logger.info("Couldn't find session id %s", session_id)
+        #     _return_json({"error": "unknown session"}, request)
+        #     return
+
+        if b"username" not in request.args:
+            _return_json({"error": "missing username"}, request)
+            return
+        localpart = request.args[b"username"][0].decode("utf-8", errors="replace")
+
+        if b"password" not in request.args:
+            _return_json({"error": "missing password"}, request)
+            return
+        password = request.args[b"password"][0].decode("utf-8", errors="replace")
+
+        uid = '@{}:localhost'.format(localpart)
+
+        success = False
+        try:
+            passwd_response = await self._module_api._auth_handler._check_local_password(uid, password)
+            if passwd_response == uid:
+                success = True
+        except Exception as e:
+            logger.warning(
+                "Error checking credentials of %s: %s %s" % (localpart, type(e), e)
+            )
+
+        response = {"success": success}
         _return_json(response, request)
 
 

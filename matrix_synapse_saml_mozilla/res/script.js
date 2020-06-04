@@ -1,60 +1,80 @@
-let regiterFields = document.getElementById("field-username");
+let registerField = document.getElementById("field-username");
+let connectUsernameField = document.getElementById("connect-field-username");
+let connectPasswordField = document.getElementById("connect-field-password");
 let inputFields = document.getElementsByClassName("field");
-let registerForm = document.getElementById("form");
-let submitButton = document.getElementById("button-submit");
+let registerForm = document.getElementById("register-form");
+let registerButton = document.getElementById("button-register-submit");
+let connectForm = document.getElementById("connect-form");
+let connectButton = document.getElementById("button-connect-submit");
 let message = document.getElementById("message");
 let tabLinkButtons = document.getElementsByClassName("tablinks");
 let tabContentBlocks = document.getElementsByClassName("tabcontent");
 
 // Remove input field placeholder if the text field is not empty
 let switchClass = function(input) {
-  if (input.value.length > 0) {
-    input.classList.add('has-contents');
-  }
-  else {
-    input.classList.remove('has-contents');
-  }
+    if (input.value.length > 0) {
+        input.classList.add('has-contents');
+    }
+    else {
+        input.classList.remove('has-contents');
+    }
 };
 
 // Submit username and receive response
 let showMessage = function(messageText) {
-  // Unhide the message text
-  message.classList.remove("hidden");
+    // Unhide the message text
+    message.classList.remove("hidden");
 
-  message.innerHTML = messageText;
+    message.innerHTML = messageText;
 };
 
 let hideMessage = function() {
-  // Hide the message text
-  message.classList.add("hidden");
+    // Hide the message text
+    message.classList.add("hidden");
 };
 
-let onResponse = function(response, success) {
-  // Display message
-  showMessage(response);
+let onRegisterResponse = function(response, success) {
+    // Display message
+    showMessage(response);
 
-  if(success) {
-    registerForm.submit();
-    return;
-  }
+    if(success) {
+        registerForm.submit();
+        return;
+    }
 
-  // Enable submit button and input field
-  submitButton.classList.remove('button--disabled');
-  submitButton.value = "Submit"
+    // Enable submit button and input field
+    registerButton.classList.remove('button--disabled');
+    registerButton.value = "Submit"
 };
+
+
+let onConnectResponse = function(response, success) {
+    // Display message
+    showMessage(response);
+
+    if(success) {
+        connectForm.submit();
+        return;
+    }
+
+    // Enable submit button and input field
+    connectButton.classList.remove('button--disabled');
+    connectButton.value = "Submit"
+};
+
 
 let allowedUsernameCharacters = RegExp("[^a-z0-9\\.\\_\\=\\-\\/]");
 let usernameIsValid = function(username) {
-  return !allowedUsernameCharacters.test(username);
+    return !allowedUsernameCharacters.test(username);
 }
 let allowedCharactersString = "" +
-"lowercase letters, " +
-"digits, " +
-"<code>.</code>, " +
-"<code>_</code>, " +
-"<code>-</code>, " +
-"<code>/</code>, " +
-"<code>=</code>";
+    "lowercase letters, " +
+    "digits, " +
+    "<code>.</code>, " +
+    "<code>_</code>, " +
+    "<code>-</code>, " +
+    "<code>/</code>, " +
+    "<code>=</code>";
 
 let buildQueryString = function(params) {
     return Object.keys(params)
@@ -62,15 +82,15 @@ let buildQueryString = function(params) {
         .join('&');
 }
 
-let submitUsername = function(username) {
-  if(username.length == 0) {
-    onResponse("Please enter a username.", false);
-    return;
-  }
-  if(!usernameIsValid(username)) {
-    onResponse("Invalid username. Only the following characters are allowed: " + allowedCharactersString, false);
-    return;
-  }
+let submitRegister = function(username) {
+    if(username.length == 0) {
+        onRegisterResponse("Please enter a username.", false);
+        return;
+    }
+    if(!usernameIsValid(username)) {
+        onRegisterResponse("Invalid username. Only the following characters are allowed: " + allowedCharactersString, false);
+        return;
+    }
 
     let check_uri = 'check?' + buildQueryString({"username": username});
     fetch(check_uri, {
@@ -86,27 +106,92 @@ let submitUsername = function(username) {
         if(json.error) {
             throw json.error;
         } else if(json.available) {
-            onResponse("Success. Please wait a moment for your browser to redirect.", true);
+            onRegisterResponse("Success. Please wait a moment for your browser to redirect.", true);
         } else {
-            onResponse("This username is not available, please choose another.", false);
+            onRegisterResponse("This username is not available, please choose another.", false);
         }
     }).catch((err) => {
-        onResponse("Error checking username availability: " + err, false);
+        onRegisterResponse("Error checking username availability: " + err, false);
     });
 }
 
-let clickSubmit = function() {
-  if(submitButton.classList.contains('button--disabled')) { return; }
+let submitConnect = function(username, password) {
+    if(username.length == 0) {
+        onConnectResponse("Please enter a username.", false);
+        return;
+    }
+    if(!usernameIsValid(username)) {
+        onConnectResponse("Invalid username. Only the following characters are allowed: " + allowedCharactersString, false);
+        return;
+    }
+    if(password.length == 0) {
+        onConnectResponse("Please enter a password.", false);
+        return;
+    }
 
-  // Disable submit button and input field
-  submitButton.classList.add('button--disabled');
+    details = {
+        username: username,
+        password: password
+    }
 
-  // Submit username
-  submitButton.value = "Checking...";
-  submitUsername(regiterFields.value);
+    var formBody = [];
+    for (var property in details) {
+        var encodedKey = encodeURIComponent(property);
+        var encodedValue = encodeURIComponent(details[property]);
+        formBody.push(encodedKey + "=" + encodedValue);
+    }
+    formBody = formBody.join("&");
+
+    fetch('check', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formBody
+    }).then((response) => {
+        if(!response.ok) {
+            // for non-200 responses, raise the body of the response as an exception
+            return response.text().then((text) => { throw text });
+        } else {
+            return response.json()
+        }
+    }).then((json) => {
+        if(json.error) {
+            throw json.error;
+        } else if(json.success) {
+            onConnectResponse("Success. Please wait a moment for your browser to redirect.", true);
+        } else {
+            onConnectResponse("The credentials you entered are not valid.", false);
+        }
+    }).catch((err) => {
+        onConnectResponse("Error checking credentials: " + err, false);
+    });
+}
+
+let registerClickSubmit = function() {
+    if(registerButton.classList.contains('button--disabled')) { return; }
+
+    // Disable submit button and input field
+    registerButton.classList.add('button--disabled');
+
+    // Submit username
+    registerButton.value = "Checking...";
+    submitRegister(registerField.value);
 };
 
-submitButton.onclick = clickSubmit;
+let connectClickSubmit = function() {
+    if(connectButton.classList.contains('button--disabled')) { return; }
+
+    // Disable submit button and input field
+    connectButton.classList.add('button--disabled');
+
+    // Submit data
+    connectButton.value = "Checking...";
+    submitConnect(connectUsernameField.value, connectPasswordField.value);
+};
+
+registerButton.onclick = registerClickSubmit;
+connectButton.onclick = connectClickSubmit;
 
 // Listen for events on inputFields
 for (let i = 0; i < inputFields.length; i++) {
@@ -114,7 +199,11 @@ for (let i = 0; i < inputFields.length; i++) {
         // Listen for Enter on input field
         if (event.which === 13) {
             event.preventDefault();
-            clickSubmit();
+            if (inputFields[i].id === "field-username") {
+                registerClickSubmit();
+            } else {
+                connectClickSubmit();
+            }
             return true;
         }
         switchClass(inputFields[i]);

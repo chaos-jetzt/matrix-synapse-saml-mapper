@@ -14,16 +14,17 @@
       </div>
       <div class="card-body">
         <div class="tabcontent active" id="register">
-          <form method="post" class="form__input" id="form" action="submit">
+          <form method="post" class="form__input" id="register-form" action="submit">
             <input type="text" name="username" id="field-username" class="field" autofocus="">
             <label for="field-username">
               <span><span aria-hidden="true">Please pick your </span>username</span>
             </label>
-            <input type="button" class="button button--full-width" id="button-submit" value="Submit">
+            <input type="button" class="button button--full-width" id="button-register-submit" value="Submit">
           </form>
         </div>
         <div class="tabcontent" id="connect">
-          <form method="post" id="form" action="submit">
+          <h4>Connect your existing Matrix-Account:</h4>
+          <form method="post" id="connect-form" action="submit">
             <div class="form__input">
               <input type="text" name="username" id="connect-field-username" class="field" autofocus="">
               <label for="connect-field-username">
@@ -32,12 +33,12 @@
             </div>
             <br>
             <div class="form__input">
-              <input type="password" name="password" id="connect-field-password">
+              <input type="password" name="password" id="connect-field-password" class="field">
               <label for="connect-field-password">
                 <span><span aria-hidden="true">Your old Matrix </span>password</span>
               </label>
             </div>
-            <input type="button" class="button button--full-width" id="button-submit" value="Submit">
+            <input type="button" class="button button--full-width" id="button-connect-submit" value="Submit">
           </form>
         </div>
         <div role=alert class="tooltip hidden" id="message"></div>
