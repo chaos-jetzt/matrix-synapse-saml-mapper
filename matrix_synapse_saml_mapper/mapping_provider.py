@@ -25,7 +25,7 @@ import synapse.module_api
 from synapse.api.errors import CodeMessageException
 from synapse.module_api.errors import RedirectException
 
-from matrix_synapse_saml_mozilla._sessions import (
+from matrix_synapse_saml_mapper._sessions import (
     SESSION_COOKIE_NAME,
     UsernameMappingSession,
     expire_old_sessions,

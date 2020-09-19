@@ -40,10 +40,10 @@ def exec_file(path_segments, name):
 
 
 setup(
-    name="matrix-synapse-saml-mozilla",
-    packages=["matrix_synapse_saml_mozilla"],
+    name="matrix-synapse-saml-mapper",
+    packages=["matrix_synapse_saml_mapper"],
     include_package_data=True,
-    description="An Mozilla-flavoured SAML MXID mapper for Synapse",
+    description="An SAML MXID mapper for Synapse",
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
     install_requires=["attr>=0.3.1", "pysaml2>=4.5.0"],

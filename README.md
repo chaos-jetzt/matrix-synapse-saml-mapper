@@ -1,14 +1,14 @@
-# Synapse Mozilla SAML MXID Mapper
+# Synapse SAML MXID Mapper
 
 A Synapse plugin module which allows users to choose their username when they
-first log in.
+first log in and map their SSO-account to a existing one.
 
 ## Installation
 
-This plugin can be installed via [PyPi](https://pypi.org):
+This plugin can be installed via pip:
 
 ```
-pip install matrix-synapse-saml-mozilla
+pip install git+https://github.com/chaos-jetzt/matrix-synapse-saml-mapper
 ```
 
 ### Config
@@ -18,7 +18,7 @@ Add the following in your Synapse config:
 ```yaml
    saml2_config:
      user_mapping_provider:
-       module: "matrix_synapse_saml_mozilla.SamlMappingProvider"
+       module: "matrix_synapse_saml_mapper.SamlMappingProvider"
 ```
 
 Also, under the HTTP client `listener`, configure an `additional_resource` as per
@@ -34,7 +34,7 @@ listeners:
 
     additional_resources:
       "/_matrix/saml2/pick_username":
-        module: "matrix_synapse_saml_mozilla.pick_username_resource"
+        module: "matrix_synapse_saml_mapper.pick_username_resource"
 ```
 
 ### Configuration Options
@@ -58,31 +58,7 @@ Currently the following options are supported:
    If both `bad_domain_file` and `bad_domain_list` are specified, the two lists
    are merged.
 
-## Implementation notes
-
-The login flow looks something like this:
-
-![login flow](https://raw.githubusercontent.com/matrix-org/matrix-synapse-saml-mozilla/master/doc/login_flow.svg?sanitize=true)
-
-## Development and Testing
-
-This repository uses `tox` to run linting and tests.
-
 ### Linting
 
 Code is linted with the `flake8` tool. Run `tox -e lint` to check for linting
 errors in the codebase.
-
-### Tests
-
-This repository uses `unittest` to run the tests located in the `tests`
-directory. They can be ran with `tox -e tests`.
-
-### Making a release
-
-```
-git tag vX.Y
-python3 setup.py sdist
-twine upload dist/matrix-synapse-saml-mozilla-X.Y.tar.gz
-git push origin vX.Y
-```
