@@ -3,6 +3,8 @@
 A Synapse plugin module which allows users to choose their username when they
 first log in and map their SSO-account to a existing one.
 
+This is a fork of https://github.com/matrix-org/matrix-synapse-saml-mozilla.
+
 ## Installation
 
 This plugin can be installed via pip:
